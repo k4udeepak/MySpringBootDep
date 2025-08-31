@@ -20,7 +20,9 @@ jobs:
           java-version: '24'  # or '11' based on your Spring Boot setup
 
       - name: Build Spring Boot application
-        run: ./gradlew bootJar
+        run: |
+         chmod +x ./gradlew
+        ./gradlew bootJar
 
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
