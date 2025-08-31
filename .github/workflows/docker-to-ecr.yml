@@ -3,7 +3,7 @@ name: Build and Push Docker Image to AWS ECR
 on:
   push:
     branches:
-      - MySpringBootDep  # Replace with the branch name you're using
+      - master # Replace with the branch name you're using
 
 jobs:
   build-and-push:
