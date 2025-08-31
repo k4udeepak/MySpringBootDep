@@ -1,0 +1,38 @@
+name: Build and Push Docker Image to AWS ECR
+
+on:
+  push:
+    branches:
+      - MySpringBootDep  # Replace with the branch name you're using
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '24'  # or '11' based on your Spring Boot setup
+
+      - name: Build Spring Boot application
+        run: ./gradlew bootJar
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and tag Docker image
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
+          docker build -t $IMAGE_URI:latest .
+          docker tag $IMAGE_URI:latest $IMAGE_URI:${{ github.sha }}
+
+      - name: Push Docker image to ECR
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPOSITORY }}
+          docker push $IMAGE_URI:latest
+          docker push $IMAGE_URI:${{ github.sha }}
